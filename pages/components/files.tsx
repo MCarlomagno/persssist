@@ -1,13 +1,17 @@
 import type { NextPage } from 'next'
-import styles from '../../styles/Home.module.css'
+import { DFile } from '../../interfaces/dfile.interface';
 
-const Header: NextPage = () => {
+interface Props {
+    files: DFile[];
+}
+const Files: NextPage<Props> = (props) => {
     return (
         <div>
-            <h1 className={styles.title}>dFiles</h1>
-            <p className={styles.subtitle}>decentralized storage for free and forever</p>
+            {props.files.map((item, i) => (
+                <p key={i}>{`${item.fileName}`}</p>
+            ))}
         </div>
     )
 }
 
-export default Header
+export default Files
