@@ -9,8 +9,6 @@ import DFiles from '../abis/DFiles.json'
 import Files from './components/files'
 import { DFile } from '../interfaces/dfile.interface'
 
-
-// promisifies filereader
 var readFile = (file: File) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -21,10 +19,6 @@ var readFile = (file: File) => {
   });
 }
 
-// For recognizing ethereum as part of the
-// window global object.
-declare let window: any;
-
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
 
 interface IFile {
@@ -32,9 +26,11 @@ interface IFile {
   type: string,
   name: string,
 }
+// For recognizing ethereum as part of the
+// window global object.
+declare let window: any;
 
 const Home: NextPage = () => {
-
   const [isLoading, setIsLoading] = useState(false);
   const [account, setAccount] = useState();
   const [dfiles, setDfiles] = useState<any>();
@@ -68,7 +64,7 @@ const Home: NextPage = () => {
     const networkId = await web3.eth.net.getId()
     const networkData = (DFiles.networks as any)[networkId]
     if (networkData) {
-      const dfiles = new web3.eth.Contract(DFiles.abi, networkData.address)
+      const dfiles = new web3.eth.Contract(DFiles.abi, networkData.address);
       setDfiles(dfiles);
       const filesCount = await dfiles.methods.fileCount().call()
       setFilesCount(filesCount);
@@ -78,7 +74,6 @@ const Home: NextPage = () => {
         const fetchedFile = await dfiles.methods.files(i).call()
         fetchecFiles.push(fetchedFile);
       }
-
       setFiles([...fetchecFiles])
     }
   }
@@ -100,9 +95,8 @@ const Home: NextPage = () => {
     setIsLoading(true);
     console.log("Submitting file to IPFS...")
     // Add file to the IPFS
-    const result = await ipfs.add(file.buffer);
-    console.log('IPFS code', result.cid.code)
-
+    const blob = new Blob([file.buffer], { type: file.type });
+    const result = await ipfs.add(blob);
 
     dfiles.methods.uploadFile(
       result.path,
@@ -121,6 +115,33 @@ const Home: NextPage = () => {
       })
   }
 
+  const downloadFile = async (file: DFile) => {
+    const iterable = ipfs.get(file.fileHash);
+
+    var chunks: Uint8Array[] = [];
+    for await (const b of iterable) {
+      chunks.push(b);
+    }
+
+    const tarball = new Blob(chunks, { type: 'application/x-tar' })
+    const tarAsArrayBuffer = await tarball.arrayBuffer();
+    const untar = await require("js-untar");
+    const result = await untar(tarAsArrayBuffer);
+    const resultFile = new Blob([result[0].buffer], { type: file.fileType })
+    var url = window.URL.createObjectURL(resultFile);
+    downloadURL(url, file.fileName);
+
+  }
+  const downloadURL = (data: any, fileName: string) => {
+    var a;
+    a = document.createElement('a');
+    a.href = data;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
 
   return (
     <div className={styles.container}>
@@ -135,7 +156,7 @@ const Home: NextPage = () => {
         <input type="file" value="" onChange={(event) => captureFile(event)} />
       </label>
       <button onClick={() => uploadFile('some random description')}>Upload File</button>
-      <Files files={files}></Files>
+      <Files files={files} onDownload={downloadFile}></Files>
     </div>
   )
 }
