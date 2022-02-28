@@ -14,7 +14,6 @@ var readFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
-
     reader.readAsArrayBuffer(file);
   });
 }
@@ -30,6 +29,9 @@ interface IFile {
 // window global object.
 declare let window: any;
 
+// dynamic import
+let untar: any;
+
 const Home: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [account, setAccount] = useState();
@@ -41,8 +43,12 @@ const Home: NextPage = () => {
   useEffect(() => {
     loadWeb3();
     loadBlockchainData();
+    loadDynamicModules();
   }, []);
 
+  const loadDynamicModules = async () => {
+    untar = await require("js-untar");
+  }
 
   const loadWeb3 = async () => {
     if (window.ethereum) {
@@ -125,9 +131,9 @@ const Home: NextPage = () => {
 
     const tarball = new Blob(chunks, { type: 'application/x-tar' })
     const tarAsArrayBuffer = await tarball.arrayBuffer();
-    const untar = await require("js-untar");
     const result = await untar(tarAsArrayBuffer);
     const resultFile = new Blob([result[0].buffer], { type: file.fileType })
+
     var url = window.URL.createObjectURL(resultFile);
     downloadURL(url, file.fileName);
 
