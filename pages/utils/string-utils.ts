@@ -1,0 +1,1 @@
+export const truncateAddress = (addr: string) => addr.slice(0, 4) + '...' + addr.slice(addr.length - 5, addr.length - 1);
