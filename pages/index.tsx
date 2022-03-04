@@ -1,6 +1,5 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
 import Header from './components/header'
 import Web3 from 'web3'
 import { ChangeEvent, useEffect, useState } from 'react'
@@ -8,6 +7,7 @@ import { create } from 'ipfs-http-client'
 import DFiles from '../abis/DFiles.json'
 import Files from './components/files'
 import { DFile } from '../interfaces/dfile.interface'
+import { NavBar } from './components/navbar/Navbar'
 
 var readFile = (file: File) => {
   return new Promise((resolve, reject) => {
@@ -41,27 +41,13 @@ const Home: NextPage = () => {
   const [file, setFile] = useState<IFile | null>();
 
   useEffect(() => {
-    loadWeb3();
-    loadBlockchainData();
+    // loadBlockchainData();
     loadDynamicModules();
   }, []);
 
   const loadDynamicModules = async () => {
     untar = await require("js-untar");
   }
-
-  const loadWeb3 = async () => {
-    if (window.ethereum) {
-      window.web3 = new Web3(window.ethereum)
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-    }
-    else if (window.web3) {
-      window.web3 = new Web3(window.web3.currentProvider)
-    }
-    else {
-      console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
-    }
-  };
 
   const loadBlockchainData = async () => {
     const web3 = window.web3
@@ -150,12 +136,13 @@ const Home: NextPage = () => {
 
 
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
         <title>dFiles</title>
         <meta name="description" content="Desentralized storage for free and forever" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <NavBar></NavBar>
       <Header></Header>
       <label>
         File:

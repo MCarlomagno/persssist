@@ -1,5 +1,5 @@
 {
-  "name": "dfiles",
+  "name": "persssist",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index",
@@ -11,6 +11,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.5.0",
+    "@heroicons/react": "^1.0.6",
+    "@tailwindcss/typography": "^0.5.2",
     "@zip.js/zip.js": "^2.4.5",
     "bootstrap": "^5.1.3",
     "extract-files": "^12.0.0",
@@ -19,6 +22,7 @@
     "next": "12.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "tailwindcss": "^3.0.23",
     "web3": "^1.7.0"
   },
   "devDependencies": {
