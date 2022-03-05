@@ -3,10 +3,11 @@ import { Disclosure, Menu } from '@headlessui/react'
 import { MenuIcon, XIcon } from '@heroicons/react/outline'
 import { NextPage } from 'next'
 import Image from 'next/image'
-import { ConnectButton } from './connect-button'
 import { ConnectionState } from '../../enums/connection-state'
 import { ConnectionStateIcon } from '../shared/connection-state-icon'
-import { UserInfo } from './user-info'
+import { UserInfo } from './user/user-info'
+import { ConnectButton } from './actions/connect-button'
+import { UploadFileButton } from './actions/upload-file-button'
 
 // For recognizing ethereum as part of the
 // window global object.
@@ -56,17 +57,13 @@ export const NavBar: NextPage = () => {
     </div>
 
     const Logo = () => <div className="flex-shrink-0 flex items-center">
-        <Image
-            src="/images/logo.svg" // Route of the image file
-            height={144} // Desired size with correct aspect ratio
-            width={144} // Desired size with correct aspect ratio
-            alt="Your Name"
-        />
+        <Image src="/images/logo.svg" height={144} width={144} alt="Your Name" />
     </div>
 
     const ActionButtons = () => <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-        <ConnectionStateIcon connectionState={connectionState}></ConnectionStateIcon>
-        {connectionState === ConnectionState.CONNECTED &&  <UserInfo address={userAddress}></UserInfo>}
+        {connectionState !== ConnectionState.CONNECTED && <ConnectionStateIcon connectionState={connectionState}></ConnectionStateIcon>}
+        {connectionState === ConnectionState.CONNECTED &&
+            <div className='flex'><UploadFileButton></UploadFileButton> <UserInfo address={userAddress}></UserInfo></div>}
         <ConnectButton onClick={connect} connectionState={connectionState}></ConnectButton>
     </div>;
 
