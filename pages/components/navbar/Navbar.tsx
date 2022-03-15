@@ -57,7 +57,7 @@ export const NavBar: NextPage = () => {
     </div>
 
     const Logo = () => <div className="flex-shrink-0 flex items-center">
-        <Image src="/images/logo.svg" height={144} width={144} alt="Your Name" />
+        <Image src="/images/logo.svg" height={144} width={144} alt="Persssist" />
     </div>
 
     const ActionButtons = () => <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

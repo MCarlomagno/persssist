@@ -8,6 +8,7 @@ import DFiles from '../abis/DFiles.json'
 import Files from './components/files'
 import { DFile } from '../interfaces/dfile.interface'
 import { NavBar } from './components/navbar/Navbar'
+import { Projects } from './components/projects/Projects'
 
 var readFile = (file: File) => {
   return new Promise((resolve, reject) => {
@@ -41,33 +42,11 @@ const Home: NextPage = () => {
   const [file, setFile] = useState<IFile | null>();
 
   useEffect(() => {
-    // loadBlockchainData();
     loadDynamicModules();
   }, []);
 
   const loadDynamicModules = async () => {
     untar = await require("js-untar");
-  }
-
-  const loadBlockchainData = async () => {
-    const web3 = window.web3
-    const accounts = await web3.eth.getAccounts()
-    setAccount(accounts[0]);
-    const networkId = await web3.eth.net.getId()
-    const networkData = (DFiles.networks as any)[networkId]
-    if (networkData) {
-      const dfiles = new web3.eth.Contract(DFiles.abi, networkData.address);
-      setDfiles(dfiles);
-      const filesCount = await dfiles.methods.fileCount().call()
-      setFilesCount(filesCount);
-
-      const fetchecFiles: any[] = [];
-      for (var i = filesCount; i >= 1; i--) {
-        const fetchedFile = await dfiles.methods.files(i).call()
-        fetchecFiles.push(fetchedFile);
-      }
-      setFiles([...fetchecFiles])
-    }
   }
 
   const captureFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -150,6 +129,7 @@ const Home: NextPage = () => {
       </label>
       <button onClick={() => uploadFile('some random description')}>Upload File</button>
       <Files files={files} onDownload={downloadFile}></Files>
+      <Projects></Projects>
     </div>
   )
 }
