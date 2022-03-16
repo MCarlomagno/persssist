@@ -42,7 +42,6 @@ export const NavBar: NextPage = () => {
             method: "eth_requestAccounts",
         });
         setUserAddress(accounts[0]);
-
     }
 
     const MobileMenuButton = (open: boolean) => <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -63,7 +62,7 @@ export const NavBar: NextPage = () => {
     const ActionButtons = () => <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
         {connectionState !== ConnectionState.CONNECTED && <ConnectionStateIcon connectionState={connectionState}></ConnectionStateIcon>}
         {connectionState === ConnectionState.CONNECTED &&
-            <div className='flex'><UploadFileButton></UploadFileButton> <UserInfo address={userAddress}></UserInfo></div>}
+            <UserInfo address={userAddress}></UserInfo>}
         <ConnectButton onClick={connect} connectionState={connectionState}></ConnectButton>
     </div>;
 

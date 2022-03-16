@@ -12,9 +12,13 @@ export const ConnectButton: NextPage<Props> = ({ onClick, connectionState }) => 
     if (connectionState === ConnectionState.CONNECTED) {
         return <></>
     }
-    return (<PrimaryButton onClick={onClick} child={'Connect'}
-        disabled={connectionState === ConnectionState.UNAVAILABLE}>
-    </PrimaryButton>);
+    return (
+        <div className="pl-4 hidden sm:block">
+            <PrimaryButton onClick={onClick} child={'Connect'}
+                disabled={connectionState === ConnectionState.UNAVAILABLE}>
+            </PrimaryButton>
+        </div>
+    );
 }
 
 

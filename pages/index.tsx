@@ -1,11 +1,9 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Header from './components/header'
 import Web3 from 'web3'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { create } from 'ipfs-http-client'
 import DFiles from '../abis/DFiles.json'
-import Files from './components/files'
 import { DFile } from '../interfaces/dfile.interface'
 import { NavBar } from './components/navbar/Navbar'
 import { Projects } from './components/projects/Projects'
@@ -35,15 +33,57 @@ let untar: any;
 
 const Home: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [account, setAccount] = useState();
-  const [dfiles, setDfiles] = useState<any>();
+  const [account, setAccount] = useState<string>();
+  const [contract, setContract] = useState<any>();
   const [filesCount, setFilesCount] = useState(0);
   const [files, setFiles] = useState<DFile[]>([]);
   const [file, setFile] = useState<IFile | null>();
 
   useEffect(() => {
     loadDynamicModules();
-  }, []);
+    loadWeb3().then(() => loadBlockchainData());
+  }, [])
+
+  const loadWeb3 = async () => {
+    window.ipfs = ipfs;
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else {
+      window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+  }
+
+  const loadBlockchainData = async () => {
+    const web3 = window.web3;
+
+    const acc: string[] = await window.ethereum.request({ method: "eth_accounts" });
+    setAccount(acc[0]);
+    // Network ID
+    const networkId = await web3.eth.net.getId()
+    const networkData = (DFiles as any).networks[networkId]
+    if (networkData) {
+      // Assign contract
+      const contract = new web3.eth.Contract((DFiles as any).abi, networkData.address)
+      setContract(contract);
+      // Get files amount
+      const filesCount = await contract.methods.fileCount().call()
+      setFilesCount(filesCount);
+      // Load files&sort by the newest
+      const fetchedFiles= [];
+      for (var i = filesCount; i >= 1; i--) {
+        const file = await contract.methods.files(i).call()
+        fetchedFiles.push(file);
+      }
+      setFiles([...fetchedFiles]);
+    } else {
+      window.alert('DStorage contract not deployed to detected network.')
+    }
+  }
 
   const loadDynamicModules = async () => {
     untar = await require("js-untar");
@@ -62,14 +102,14 @@ const Home: NextPage = () => {
   }
 
   const uploadFile = async (description: string) => {
-    if (!file || !file.buffer || !dfiles) return;
+    if (!file || !file.buffer || !contract) return;
     setIsLoading(true);
     console.log("Submitting file to IPFS...")
     // Add file to the IPFS
     const blob = new Blob([file.buffer], { type: file.type });
     const result = await ipfs.add(blob);
 
-    dfiles.methods.uploadFile(
+    contract.methods.uploadFile(
       result.path,
       result.size,
       file.type,
@@ -117,19 +157,20 @@ const Home: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>dFiles</title>
+        <title>Persssist</title>
         <meta name="description" content="Desentralized storage for free and forever" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar></NavBar>
-      <Header></Header>
-      <label>
-        File:
-        <input type="file" value="" onChange={(event) => captureFile(event)} />
-      </label>
-      <button onClick={() => uploadFile('some random description')}>Upload File</button>
-      <Files files={files} onDownload={downloadFile}></Files>
-      <Projects></Projects>
+
+      <Projects files={files} onDownload={downloadFile} contract={contract} ipfs={ipfs} account={account}></Projects>
+      <div>
+        <label>
+          File:
+          <input type="file" value="" onChange={(event) => captureFile(event)} />
+        </label>
+        <button onClick={() => uploadFile('some random description')}>Upload File</button>
+      </div>
     </div>
   )
 }

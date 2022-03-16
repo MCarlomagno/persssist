@@ -1,4 +1,4 @@
-export class FileType {
+export class FilePath {
     static csv = '/images/filetypes/csv.png';
     static doc = '/images/filetypes/doc.png';
     static docx = '/images/filetypes/doc.png';
@@ -14,16 +14,16 @@ export class FileType {
 }
 
 export const fileTypes: any = {
-    'text/csv': FileType.csv,
-    'application/msword': FileType.doc,
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': FileType.doc,
-    'audio/mpeg': FileType.mp3,
-    'video/mp4': FileType.mp4,
-    'application/pdf': FileType.pdf,
-    'image/vnd.adobe.photoshop': FileType.photoshop,
-    'image/png': FileType.png,
-    'application/vnd.ms-powerpoint': FileType.ppt,
-    'image/svg+xml': FileType.svg,
-    'application/zip': FileType.zip,
-    'undefined': FileType.undefined,
+    'text/csv': FilePath.csv,
+    'application/msword': FilePath.doc,
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': FilePath.doc,
+    'audio/mpeg': FilePath.mp3,
+    'video/mp4': FilePath.mp4,
+    'application/pdf': FilePath.pdf,
+    'image/vnd.adobe.photoshop': FilePath.photoshop,
+    'image/png': FilePath.png,
+    'application/vnd.ms-powerpoint': FilePath.ppt,
+    'image/svg+xml': FilePath.svg,
+    'application/zip': FilePath.zip,
+    'undefined': FilePath.undefined,
 }

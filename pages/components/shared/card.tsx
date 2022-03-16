@@ -5,19 +5,20 @@ import { DotsVerticalIcon, DownloadIcon } from '@heroicons/react/outline';
 import { NextPage } from 'next'
 import { Fragment } from 'react';
 import Image from 'next/image'
-import { FileType, fileTypes } from '../constants/file-types';
+import { FilePath, fileTypes } from '../constants/file-types';
+import { DFile } from '../../../interfaces/dfile.interface';
+import { truncateName } from '../../utils/string-utils';
 
-class Props {
-    title?: string;
-    size?: string;
-    fileType?: string;
+interface Props {
+    file: DFile;
+    download: Function;
 }
 
-export const Card: NextPage<Props> = ({ title, size, fileType }) => {
+export const Card: NextPage<Props> = ({ file, download }) => {
 
     return (
         <div className="flex items-center justify-center">
-            <a className="hover:border-neutral-400 border-neutral-200 border-2 p-3 rounded-lg group" href="#">
+            <a className="hover:border-neutral-400 border-neutral-200 border-2 p-3 rounded-lg group w-48" href="#">
                 <div className="text-right">
                     <Menu as="div" className="relative inline-block text-left">
                         <div>
@@ -43,6 +44,7 @@ export const Card: NextPage<Props> = ({ title, size, fileType }) => {
                                     <Menu.Item>
                                         {({ active }) => (
                                             <button
+                                                onClick={() => download()}
                                                 className={`${active ? 'bg-violet-500 text-white' : 'text-gray-900'
                                                     } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                             >
@@ -69,11 +71,11 @@ export const Card: NextPage<Props> = ({ title, size, fileType }) => {
                     </Menu>
                 </div>
                 <div className='p-5 md:p-10 z-0'>
-                    <Image src={fileTypes[fileType ?? 'undefined'] ?? FileType.undefined} className="rounded" height={100} width={100} />
+                    <Image src={fileTypes[file.fileType ?? 'undefined'] ?? FilePath.undefined} className="rounded" height={100} width={100} />
                 </div>
 
-                <h3 className="text-gray-900 font-bold text-lg">{title}</h3>
-                <p className="text-gray-400 text-xs font-semibold">{size}</p>
+                <h3 className="text-gray-900 font-bold text-lg">{truncateName(file.fileName)}</h3>
+                <p className="text-gray-400 text-xs font-semibold">{file.fileSize}</p>
             </a>
         </div>
     )
