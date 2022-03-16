@@ -8,22 +8,7 @@ import { DFile } from '../interfaces/dfile.interface'
 import { NavBar } from './components/navbar/Navbar'
 import { Projects } from './components/projects/Projects'
 
-var readFile = (file: File) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-
-interface IFile {
-  buffer: Buffer,
-  type: string,
-  name: string,
-}
 // For recognizing ethereum as part of the
 // window global object.
 declare let window: any;
@@ -32,12 +17,9 @@ declare let window: any;
 let untar: any;
 
 const Home: NextPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [account, setAccount] = useState<string>();
   const [contract, setContract] = useState<any>();
-  const [filesCount, setFilesCount] = useState(0);
   const [files, setFiles] = useState<DFile[]>([]);
-  const [file, setFile] = useState<IFile | null>();
 
   useEffect(() => {
     loadDynamicModules();
@@ -72,7 +54,6 @@ const Home: NextPage = () => {
       setContract(contract);
       // Get files amount
       const filesCount = await contract.methods.fileCount().call()
-      setFilesCount(filesCount);
       // Load files&sort by the newest
       const fetchedFiles= [];
       for (var i = filesCount; i >= 1; i--) {
@@ -87,43 +68,6 @@ const Home: NextPage = () => {
 
   const loadDynamicModules = async () => {
     untar = await require("js-untar");
-  }
-
-  const captureFile = async (event: ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    if (!event.target || !event.target.files) return;
-    const file = event.target.files[0];
-    const result = await readFile(file);
-    setFile({
-      buffer: Buffer.from(new Uint8Array(result as ArrayBuffer)),
-      type: file.type,
-      name: file.name,
-    });
-  }
-
-  const uploadFile = async (description: string) => {
-    if (!file || !file.buffer || !contract) return;
-    setIsLoading(true);
-    console.log("Submitting file to IPFS...")
-    // Add file to the IPFS
-    const blob = new Blob([file.buffer], { type: file.type });
-    const result = await ipfs.add(blob);
-
-    contract.methods.uploadFile(
-      result.path,
-      result.size,
-      file.type,
-      file.name,
-      description,
-    ).send({ from: account })
-      .on('transactionHash', (hash: string) => {
-        setIsLoading(false);
-        setFile(null);
-        window.location.reload()
-      }).on('error', (e: any) => {
-        console.log(e);
-        setIsLoading(false);
-      })
   }
 
   const downloadFile = async (file: DFile) => {
@@ -162,15 +106,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar></NavBar>
-
       <Projects files={files} onDownload={downloadFile} contract={contract} ipfs={ipfs} account={account}></Projects>
-      <div>
-        <label>
-          File:
-          <input type="file" value="" onChange={(event) => captureFile(event)} />
-        </label>
-        <button onClick={() => uploadFile('some random description')}>Upload File</button>
-      </div>
     </div>
   )
 }
