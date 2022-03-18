@@ -1,8 +1,14 @@
 
+import { Col, Row } from 'antd';
 import { NextPage } from 'next'
 import { DFile } from '../../../interfaces/dfile.interface';
 import { Card } from '../shared/card'
-import { UploadCard } from './upload_card';
+import { Grid } from 'antd';
+import { useState } from 'react';
+
+const { useBreakpoint } = Grid;
+
+
 
 interface Props {
     files: DFile[];
@@ -12,18 +18,22 @@ interface Props {
     account: string | undefined;
 }
 
-export const Projects: NextPage<Props> = ({ files, onDownload, contract, ipfs, account }) => {
+export const Projects: NextPage<Props> = ({ files, onDownload }) => {
+
+    const screens = useBreakpoint();
+
+    var cardSize = screens.md ? 6 : 9;
+
     const download = (file: DFile) => {
         onDownload(file);
     }
 
     return (
-        <div className='p-10 grid grid-cols-2 md:grid-cols-4'>
-            <UploadCard contract={contract} ipfs={ipfs} account={account} ></UploadCard>
-            {files.map((item, i) =>
+        <Row justify='center' >
+            {files.map((item, i) => 
+            (<Col span={cardSize}>
                 <Card key={i} file={item} download={() => download(item)}></Card>
-            )
-            }
-        </div >
+            </Col>))}
+        </Row >
     )
 }

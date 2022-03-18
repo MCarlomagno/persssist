@@ -1,11 +1,10 @@
-import { Button, Upload, message, Space, Row, Col, Modal } from 'antd';
+import { Button, Upload, message, Space, Row, Col, Modal, PageHeader, Divider, Typography } from 'antd';
 import { NextPage } from 'next'
 import { useState } from 'react';
-import { BsCloudUploadFill } from 'react-icons/bs';
-import { UploadFileButton } from '../navbar/actions/upload-file-button';
 import {InboxOutlined, UploadOutlined} from '@ant-design/icons';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/lib/upload/interface';
+const { Text, Title } = Typography;
 const { Dragger } = Upload;
 
 interface Props {
@@ -20,7 +19,7 @@ interface IFile {
     name: string,
 }
 
-export const UploadCard: NextPage<Props> = ({ contract, ipfs, account }) => {
+export const Header: NextPage<Props> = ({ contract, ipfs, account }) => {
 
     let [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -65,17 +64,19 @@ export const UploadCard: NextPage<Props> = ({ contract, ipfs, account }) => {
     }
 
     return (
-        <div className="flex align-center">
-
-            <div className="flex flex-col align-center text-center justify-center hover:border-neutral-400 border-dashed border-neutral-200 border-2 p-3 rounded-lg group">
-                <BsCloudUploadFill className="text-center align-center m-10 text-5xl md:m-10 md:text-6xl"></BsCloudUploadFill>
-                <h3 className="text-gray-900 font-bold text-lg">Start Sharing</h3>
-                <p className="text-gray-400 text-xs font-semibold pb-4">Upload files for free</p>
-                <div className="flex justify-center">
-                    <UploadFileButton onClick={openModal}></UploadFileButton>
+        <div className="align-center">
+            <div className='flex flex-col align-center text-center mt-10'>
+                <Title level={3}> Welcome to Persssist </Title>
+                <Text type='secondary'>
+                    Decentralized blockchain platform for uploading, downloading and sharing files without any restriction.
+                </Text>
+                <div className='flex justify-center mt-5'>
+                <Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={openModal}>Start sharing</Button>
                 </div>
             </div>
-            
+
+            <Divider/>
+                        
             <Modal title="Upload File" visible={isOpen} footer={false} destroyOnClose={true} onOk={onSubmit} onCancel={closeModal}>
                 <Dragger name={'file'}onChange={onFileChange}>
                     <p className="ant-upload-drag-icon">

@@ -8,6 +8,7 @@ import { DFile } from '../interfaces/dfile.interface'
 import { NavBar } from './components/navbar/Navbar'
 import { Projects } from './components/projects/Projects'
 import "antd/dist/antd.css";
+import { Header } from './components/header/header'
 
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
 // For recognizing ethereum as part of the
@@ -107,6 +108,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar></NavBar>
+      <Header contract={contract} ipfs={ipfs} account={account} ></Header>
       <Projects files={files} onDownload={downloadFile} contract={contract} ipfs={ipfs} account={account}></Projects>
     </div>
   )
