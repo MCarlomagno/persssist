@@ -1,12 +1,13 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Web3 from 'web3'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { create } from 'ipfs-http-client'
 import DFiles from '../abis/DFiles.json'
 import { DFile } from '../interfaces/dfile.interface'
 import { NavBar } from './components/navbar/Navbar'
 import { Projects } from './components/projects/Projects'
+import "antd/dist/antd.css";
 
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
 // For recognizing ethereum as part of the

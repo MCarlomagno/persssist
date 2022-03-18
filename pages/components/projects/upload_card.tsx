@@ -1,9 +1,12 @@
-import { Dialog, Transition } from '@headlessui/react';
+import { Button, Upload, message, Space, Row, Col, Modal } from 'antd';
 import { NextPage } from 'next'
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { BsCloudUploadFill } from 'react-icons/bs';
 import { UploadFileButton } from '../navbar/actions/upload-file-button';
-import { FileUpload } from '../shared/file-upload';
+import {InboxOutlined, UploadOutlined} from '@ant-design/icons';
+import { UploadChangeParam } from 'antd/lib/upload';
+import { UploadFile } from 'antd/lib/upload/interface';
+const { Dragger } = Upload;
 
 interface Props {
     contract: any;
@@ -11,20 +14,59 @@ interface Props {
     account: string | undefined;
 }
 
+interface IFile {
+    buffer: Buffer,
+    type: string,
+    name: string,
+}
+
 export const UploadCard: NextPage<Props> = ({ contract, ipfs, account }) => {
 
-    let [isOpen, setIsOpen] = useState(false)
+    let [isOpen, setIsOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [file, setFile] = useState<IFile | null>();
 
-    function closeModal() {
-        setIsOpen(false)
+    const closeModal = () => setIsOpen(false);
+    const openModal = () => setIsOpen(true);
+
+    const onFileChange = async (info: UploadChangeParam<UploadFile>) => {
+        const rcFile = info.file;
+        const arrayBuffer = await rcFile.originFileObj?.arrayBuffer();
+        setFile({
+          buffer: Buffer.from(new Uint8Array(arrayBuffer as ArrayBuffer)),
+          type: rcFile.type ?? '',
+          name: rcFile.name ?? '',
+      });
     }
 
-    function openModal() {
-        setIsOpen(true)
+    const onSubmit = async () => {
+        if (!file || !file.buffer || !contract) return;
+        setIsLoading(true);
+        const blob = new Blob([file.buffer], { type: file.type });
+        const result = await ipfs.add(blob);
+
+        contract.methods.uploadFile(
+            result.path,
+            result.size,
+            file.type,
+            file.name,
+            'some generic description',
+        ).send({ from: account })
+            .on('transactionHash', (hash: string) => {
+                setIsLoading(false);
+                message.success(`File uploaded successfully.`);
+                closeModal();
+                setFile(null);
+            }).on('error', (e: any) => {
+                console.log(e);
+                message.error(`Some error has ocurred`);
+                setIsLoading(false);
+            })
     }
 
     return (
         <div className="flex align-center">
+
             <div className="flex flex-col align-center text-center justify-center hover:border-neutral-400 border-dashed border-neutral-200 border-2 p-3 rounded-lg group">
                 <BsCloudUploadFill className="text-center align-center m-10 text-5xl md:m-10 md:text-6xl"></BsCloudUploadFill>
                 <h3 className="text-gray-900 font-bold text-lg">Start Sharing</h3>
@@ -33,71 +75,24 @@ export const UploadCard: NextPage<Props> = ({ contract, ipfs, account }) => {
                     <UploadFileButton onClick={openModal}></UploadFileButton>
                 </div>
             </div>
-
-            <Transition appear show={isOpen} as={Fragment}>
-                <Dialog
-                    as="div"
-                    className="fixed inset-0 z-10 overflow-y-auto"
-                    onClose={closeModal}
-                >
-                    <div className="min-h-screen px-4 text-center">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <Dialog.Overlay className="fixed inset-0" />
-                        </Transition.Child>
-
-                        {/* This element is to trick the browser into centering the modal contents. */}
-                        <span
-                            className="inline-block h-screen align-middle"
-                            aria-hidden="true"
-                        >
-                            &#8203;
-                        </span>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 scale-95"
-                            enterTo="opacity-100 scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 scale-100"
-                            leaveTo="opacity-0 scale-95"
-                        >
-                            <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-                                <Dialog.Title
-                                    as="h3"
-                                    className="text-lg font-medium leading-6 text-gray-900"
-                                >
-                                    Upload File
-                                </Dialog.Title>
-                                <div className="mt-2">
-                                    <p className="text-sm text-gray-500">
-                                        Select the file you want to upload and then confirm
-                                    </p>
-                                </div>
-
-                                <FileUpload account={account} contract={contract} ipfs={ipfs}></FileUpload>
-
-                                <div className="mt-4">
-                                    <button
-                                        type="button"
-                                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                                        onClick={closeModal}
-                                    >
-                                        Got it, thanks!
-                                    </button>
-                                </div>
-                            </div>
-                        </Transition.Child>
-                    </div>
-                </Dialog>
-            </Transition>
+            
+            <Modal title="Upload File" visible={isOpen} footer={false} destroyOnClose={true} onOk={onSubmit} onCancel={closeModal}>
+                <Dragger name={'file'}onChange={onFileChange}>
+                    <p className="ant-upload-drag-icon">
+                    <InboxOutlined />
+                    </p>
+                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                    <p className="ant-upload-hint">
+                    Support for a single file.
+                    </p>
+                </Dragger>
+                <Row className='mt-4'>
+                    <Col offset={15}>
+                        <Button onClick={closeModal} type="text">Cancel</Button>
+                        <Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={onSubmit}>Upload</Button>
+                    </Col>
+                </Row>
+            </Modal>
         </div>
     )
 }

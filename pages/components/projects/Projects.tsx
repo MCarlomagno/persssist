@@ -17,8 +17,6 @@ export const Projects: NextPage<Props> = ({ files, onDownload, contract, ipfs, a
         onDownload(file);
     }
 
-    console.log(files);
-
     return (
         <div className='p-10 grid grid-cols-2 md:grid-cols-4'>
             <UploadCard contract={contract} ipfs={ipfs} account={account} ></UploadCard>
