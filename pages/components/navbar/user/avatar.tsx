@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { ConnectionStateIcon } from "../../shared/connection-state-icon";
+import { ConnectionStateIcon } from "../connection-state-icon";
 import { ConnectionState } from '../../../enums/connection-state';
 
 interface Props {

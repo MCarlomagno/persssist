@@ -4,10 +4,9 @@ import { MenuIcon, XIcon } from '@heroicons/react/outline'
 import { NextPage } from 'next'
 import Image from 'next/image'
 import { ConnectionState } from '../../enums/connection-state'
-import { ConnectionStateIcon } from '../shared/connection-state-icon'
+import { ConnectionStateIcon } from './connection-state-icon'
 import { UserInfo } from './user/user-info'
 import { ConnectButton } from './actions/connect-button'
-import { UploadFileButton } from './actions/upload-file-button'
 
 // For recognizing ethereum as part of the
 // window global object.
