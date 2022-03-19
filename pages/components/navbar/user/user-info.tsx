@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { truncateAddress } from "../../../utils/string-utils";
+import { truncateAddress } from "../../../utils/format";
 import { Avatar } from "./avatar";
 
 interface Props {

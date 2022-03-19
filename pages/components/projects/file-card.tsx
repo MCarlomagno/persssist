@@ -1,8 +1,8 @@
 import { NextPage } from 'next'
 import Image from 'next/image'
-import { FilePath, fileTypes } from '../constants/file-types';
+import { FilePath, fileTypes } from '../../constants/file-types';
 import { PersssistFile } from '../../interfaces/persssist-file.interface';
-import { truncateName } from '../../utils/string-utils';
+import { bytesToSize, truncateName } from '../../utils/format';
 import { Card } from 'antd';
 import { DownloadOutlined}  from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
@@ -13,7 +13,6 @@ interface Props {
 }
 
 export const FileCard: NextPage<Props> = ({ file, download }) => {
-
     return (<Card
         cover={
             <div className='text-center mt-5'>
@@ -26,7 +25,7 @@ export const FileCard: NextPage<Props> = ({ file, download }) => {
         actions={[<DownloadOutlined onClick={() => download()} key="download" />]}>
         <Meta
         title={truncateName(file.fileName)}
-        description={file.fileSize}
+        description={bytesToSize(parseInt(file.fileSize))}
         />
     </Card>)
 }
