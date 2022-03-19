@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {InboxOutlined, UploadOutlined} from '@ant-design/icons';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/lib/upload/interface';
+import { IFile } from '../../interfaces/ifile.interface';
 const { Text, Title } = Typography;
 const { Dragger } = Upload;
 
@@ -11,12 +12,6 @@ interface Props {
     contract: any;
     ipfs: any;
     account: string | undefined;
-}
-
-interface IFile {
-    buffer: Buffer,
-    type: string,
-    name: string,
 }
 
 export const Header: NextPage<Props> = ({ contract, ipfs, account }) => {
@@ -38,6 +33,19 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account }) => {
       });
     }
 
+    const onUploadSuccess = (hash: String) => {
+        setIsLoading(false);
+        setFile(null);
+        message.success(`File uploaded successfully.`);
+        closeModal();
+    }
+
+    const onUploadError = (e: any) => {
+        console.log(e);
+        message.error(`Some error has ocurred`);
+        setIsLoading(false);
+    }
+
     const onSubmit = async () => {
         if (!file || !file.buffer || !contract) return;
         setIsLoading(true);
@@ -49,18 +57,9 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account }) => {
             result.size,
             file.type,
             file.name,
-            'some generic description',
         ).send({ from: account })
-            .on('transactionHash', (hash: string) => {
-                setIsLoading(false);
-                message.success(`File uploaded successfully.`);
-                closeModal();
-                setFile(null);
-            }).on('error', (e: any) => {
-                console.log(e);
-                message.error(`Some error has ocurred`);
-                setIsLoading(false);
-            })
+            .on('transactionHash', onUploadSuccess)
+            .on('error', onUploadError)
     }
 
     return (

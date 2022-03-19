@@ -1,14 +1,14 @@
 import { NextPage } from 'next'
 import Image from 'next/image'
 import { FilePath, fileTypes } from '../constants/file-types';
-import { DFile } from '../../../interfaces/dfile.interface';
+import { PersssistFile } from '../../interfaces/persssist-file.interface';
 import { truncateName } from '../../utils/string-utils';
 import { Card } from 'antd';
 import { DownloadOutlined}  from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 
 interface Props {
-    file: DFile;
+    file: PersssistFile;
     download: Function;
 }
 

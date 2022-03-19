@@ -1,11 +1,9 @@
 
-export interface DFile {
-    fileDescription: string;
-    fileHash: string;
+export interface PersssistFile {
     fileId: string;
+    filePath: string;
     fileName: string;
     fileSize: string;
     fileType: string;
-    uploadTime: string;
     uploader: string;
 }
