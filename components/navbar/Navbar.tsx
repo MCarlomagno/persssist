@@ -18,13 +18,12 @@ export const NavBar: NextPage = () => {
     const [userAddress, setUserAddress] = useState("");
 
     useEffect(() => {
+        async function listenMetamask() {
+            window.ethereum?.on('accountsChanged', initializeConnectionState);
+        }
         listenMetamask();
         initializeConnectionState();
     }, []);
-
-    async function listenMetamask() {
-        window.ethereum?.on('accountsChanged', initializeConnectionState);
-    }
 
     async function initializeConnectionState() {
         if (!window.ethereum) return setConnectionState(ConnectionState.UNAVAILABLE);
