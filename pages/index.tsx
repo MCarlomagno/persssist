@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Web3 from 'web3'
 import { useEffect, useState } from 'react'
 import { create } from 'ipfs-http-client'
-import Persssist from '../abis/persssist.json'
+import Persssist from '../abis/persssist.json' assert {type: 'json'};
 import { NavBar } from './components/navbar/Navbar'
 import { Projects } from './components/projects/Projects'
 import "antd/dist/antd.css";
