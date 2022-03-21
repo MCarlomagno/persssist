@@ -11,9 +11,9 @@ import { Header } from './components/header/header'
 import { PersssistFile } from './interfaces/persssist-file.interface'
 
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-// For recognizing ethereum as part of the
-// window global object.
 declare let window: any;
+
+const contractAddress = '0x89c096ef23d6644ddf65c72f7fd48cae843dd261';
 
 // dynamic import
 let untar: any;
@@ -37,7 +37,7 @@ const Home: NextPage = () => {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum)
       await window.ethereum.enable()
-    }
+    } 
     else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider)
     }
@@ -50,14 +50,8 @@ const Home: NextPage = () => {
     const web3 = window.web3;
     const acc: string[] = await window.ethereum.request({ method: "eth_accounts" });
     setAccount(acc[0]);
-    const networkId = await web3.eth.net.getId()
-    const networkData = (Persssist as any).networks[networkId]
-    if (networkData) {
-      const persssistContract = new web3.eth.Contract((Persssist as any).abi, networkData.address)
-      setContract(persssistContract);
-    } else {
-      window.alert('DStorage contract not deployed to detected network.')
-    }
+    const persssistContract = new web3.eth.Contract((Persssist as any), contractAddress)
+    setContract(persssistContract);
   }
 
   const subscribeToEvents = () => {
