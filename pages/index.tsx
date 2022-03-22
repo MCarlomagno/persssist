@@ -4,6 +4,7 @@ import Web3 from 'web3'
 import { useEffect, useState } from 'react'
 import { create } from 'ipfs-http-client'
 import Persssist from '../public/abis/Persssist.json'
+import PersssistLocal from '../abis/Persssist.json'
 import { NavBar } from '../components/navbar/Navbar'
 import { Projects } from '../components/projects/Projects'
 import "antd/dist/antd.css";
@@ -13,8 +14,6 @@ import { PersssistFile } from '../interfaces/persssist-file.interface'
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
 declare let window: any;
 
-const contractAddress = '0x89c096ef23d6644ddf65c72f7fd48cae843dd261';
-
 // dynamic import
 let untar: any;
 
@@ -22,6 +21,7 @@ const Home: NextPage = () => {
   const [account, setAccount] = useState<string>();
   const [contract, setContract] = useState<any>();
   const [files, setFiles] = useState<PersssistFile[]>([]);
+  const [metamaskEnabled, setMetamaskEnabled] = useState<boolean>(false);
 
   useEffect(() => {
     const loadDynamicModules = async () => {
@@ -33,12 +33,15 @@ const Home: NextPage = () => {
       if (window.ethereum) {
         window.web3 = new Web3(window.ethereum)
         await window.ethereum.enable()
+        setMetamaskEnabled(true);
       } 
       else if (window.web3) {
         window.web3 = new Web3(window.web3.currentProvider)
+        setMetamaskEnabled(true);
       }
       else {
-        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
+        setMetamaskEnabled(false);
       }
     }
 
@@ -76,8 +79,23 @@ const Home: NextPage = () => {
     const web3 = window.web3;
     const acc: string[] = await window.ethereum.request({ method: "eth_accounts" });
     setAccount(acc[0]);
-    const persssistContract = new web3.eth.Contract((Persssist as any), contractAddress)
-    setContract(persssistContract);
+
+    if(process.env.NEXT_PUBLIC_MODE === 'DEV') {
+      const networkId = await web3.eth.net.getId()
+      const networkData = (PersssistLocal as any).networks[networkId]
+      if (networkData) {
+        const persssistContract = new web3.eth.Contract((PersssistLocal as any).abi, networkData.address)
+        setContract(persssistContract);
+      } else {
+        window.alert('Perssist contract not deployed to detected network.')
+      }
+    }
+
+    if(process.env.NEXT_PUBLIC_MODE === 'PROD') {
+      const persssistContract = new web3.eth.Contract((Persssist as any), process.env.NEXT_PUBLIC_CONTRACT);
+      setContract(persssistContract);
+    }
+ 
   }
 
   const downloadFile = async (file: PersssistFile) => {
@@ -116,7 +134,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar></NavBar>
-      <Header contract={contract} ipfs={ipfs} account={account}></Header>
+      <Header contract={contract} ipfs={ipfs} account={account} enabled={metamaskEnabled}></Header>
       <Projects files={files} onDownload={downloadFile} contract={contract} ipfs={ipfs} account={account}></Projects>
     </div>
   )

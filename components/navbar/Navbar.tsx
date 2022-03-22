@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Disclosure, Menu } from '@headlessui/react'
+import { Disclosure } from '@headlessui/react'
 import { MenuIcon, XIcon } from '@heroicons/react/outline'
 import { NextPage } from 'next'
 import Image from 'next/image'
 import { ConnectionState } from '../../enums/connection-state'
 import { ConnectionStateIcon } from './connection-state-icon'
 import { UserInfo } from './user/user-info'
-import { ConnectButton } from './actions/connect-button'
-
+import { Button, Space } from 'antd'
+import { Grid } from 'antd'
 // For recognizing ethereum as part of the
 // window global object.
 declare let window: any;
 
+const { useBreakpoint } = Grid;
+
 export const NavBar: NextPage = () => {
 
     const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED);
-    const [userAddress, setUserAddress] = useState("");
+    const [userAddress, setUserAddress] = useState("")
+    const screens = useBreakpoint()
 
     useEffect(() => {
         async function listenMetamask() {
@@ -54,14 +57,16 @@ export const NavBar: NextPage = () => {
     </div>
 
     const Logo = () => <div className="flex-shrink-0 flex items-center">
-        <Image src="/images/logo.svg" height={144} width={144} alt="Persssist" />
+        <Image src="/images/logo.svg" height={60} width={144} alt="Persssist" />
     </div>
 
     const ActionButtons = () => <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-        {connectionState !== ConnectionState.CONNECTED && <ConnectionStateIcon connectionState={connectionState}></ConnectionStateIcon>}
-        {connectionState === ConnectionState.CONNECTED &&
-            <UserInfo address={userAddress}></UserInfo>}
-        <ConnectButton onClick={connect} connectionState={connectionState}></ConnectButton>
+        
+        <Space size={'middle'}>
+            {connectionState !== ConnectionState.CONNECTED && <ConnectionStateIcon connectionState={connectionState}></ConnectionStateIcon>}
+            {connectionState === ConnectionState.CONNECTED && <UserInfo address={userAddress}></UserInfo>}
+            {connectionState !== ConnectionState.CONNECTED && <Button type='primary' onClick={connect} >Connect</Button>}
+        </Space>
     </div>;
 
     return (
@@ -70,7 +75,7 @@ export const NavBar: NextPage = () => {
                 <>
                     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
                         <div className="relative flex items-center justify-between h-16">
-                            {MobileMenuButton(open)}
+                            {connectionState !== ConnectionState.CONNECTED &&  MobileMenuButton(open)}
                             <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                                 {Logo()}
                             </div>
@@ -78,19 +83,11 @@ export const NavBar: NextPage = () => {
                         </div>
                     </div>
 
-                    <Disclosure.Panel className="sm:hidden">
-                        <div className="px-2 pt-2 pb-3 space-y-1">
-                            <Disclosure.Button
-                                key={'connect'}
-                                as="a"
-                                className={'text-gray-300 hover:bg-gray-700 hover:text-white'}
-                                aria-current={'page'}
-                            >
-                                Connect
-                            </Disclosure.Button>
-                            ))
-                        </div>
-                    </Disclosure.Panel>
+                    {open && !screens.md && 
+                        <Button type="link"                   
+                            onClick={connect} block>
+                            Connect
+                        </Button>}
                 </>
             )}
         </Disclosure>

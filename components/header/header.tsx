@@ -12,9 +12,10 @@ interface Props {
     contract: any;
     ipfs: any;
     account: string | undefined;
+    enabled: boolean;
 }
 
-export const Header: NextPage<Props> = ({ contract, ipfs, account }) => {
+export const Header: NextPage<Props> = ({ contract, ipfs, account, enabled }) => {
 
     let [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +71,7 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account }) => {
                     Decentralized blockchain platform for uploading, downloading and sharing files without any restriction.
                 </Text>
                 <div className='flex justify-center mt-5'>
-                <Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={openModal}>Start sharing</Button>
+                <Button type="primary" disabled={!enabled || !account} icon={<UploadOutlined />} onClick={openModal}>Start sharing</Button>
                 </div>
             </div>
 

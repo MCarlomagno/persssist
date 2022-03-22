@@ -1,7 +1,4 @@
 import { NextPage } from "next";
-import { ConnectionStateIcon } from "../connection-state-icon";
-import { ConnectionState } from '../../../enums/connection-state';
-import Image from 'next/image'
 import { Avatar, Badge } from "antd";
 
 interface Props {

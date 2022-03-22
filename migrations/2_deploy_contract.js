@@ -1,5 +1,5 @@
-const DFiles = artifacts.require("Persssist");
+const Persssist = artifacts.require("Persssist");
 
 module.exports = function(_deployer) {
-  _deployer.deploy(DFiles); 
+  _deployer.deploy(Persssist); 
 };
