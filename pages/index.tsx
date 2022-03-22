@@ -131,7 +131,7 @@ const Home: NextPage = () => {
       <Head>
         <title>Persssist</title>
         <meta name="description" content="Desentralized storage for free and forever" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="favicon.ico" />
       </Head>
       <NavBar></NavBar>
       <Header contract={contract} ipfs={ipfs} account={account} enabled={metamaskEnabled}></Header>

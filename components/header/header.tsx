@@ -78,7 +78,7 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account, enabled }) =>
             <Divider/>
                         
             <Modal title="Upload File" visible={isOpen} footer={false} destroyOnClose={true} onOk={onSubmit} onCancel={closeModal}>
-                <Dragger name={'file'}onChange={onFileChange}>
+                <Dragger name={'file'} onChange={onFileChange} action={'/api/hello'}>
                     <p className="ant-upload-drag-icon">
                     <InboxOutlined />
                     </p>
