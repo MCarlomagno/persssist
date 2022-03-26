@@ -8,6 +8,10 @@ import { ConnectionStateIcon } from './connection-state-icon'
 import { UserInfo } from './user/user-info'
 import { Button, Space } from 'antd'
 import { Grid } from 'antd'
+
+import { fetchAccounts } from '../../store/slices/accounts'
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store'
 // For recognizing ethereum as part of the
 // window global object.
 declare let window: any;
@@ -19,22 +23,22 @@ export const NavBar: NextPage = () => {
     const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED);
     const [userAddress, setUserAddress] = useState("")
     const screens = useBreakpoint()
+    const dispatch = useDispatch();
+    const accounts = useSelector((state: RootState) => {
+        return state.accountSlice.list
+    })
 
     useEffect(() => {
-        async function listenMetamask() {
-            window.ethereum?.on('accountsChanged', initializeConnectionState);
+        async function listenMetamask() { 
+            window.ethereum?.on('accountsChanged', initializeAccount);
         }
         listenMetamask();
-        initializeConnectionState();
+        initializeAccount();
     }, []);
 
-    async function initializeConnectionState() {
+    async function initializeAccount() {
         if (!window.ethereum) return setConnectionState(ConnectionState.UNAVAILABLE);
-
-        const accounts: string[] = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts.length === 0) return setConnectionState(ConnectionState.DISCONNECTED);
-
-        setUserAddress(accounts[0]);
+        dispatch(fetchAccounts());
         return setConnectionState(ConnectionState.CONNECTED);
     }
 
@@ -64,7 +68,7 @@ export const NavBar: NextPage = () => {
         
         <Space size={'middle'}>
             {connectionState !== ConnectionState.CONNECTED && <ConnectionStateIcon connectionState={connectionState}></ConnectionStateIcon>}
-            {connectionState === ConnectionState.CONNECTED && <UserInfo address={userAddress}></UserInfo>}
+            {connectionState === ConnectionState.CONNECTED && <UserInfo address={ accounts?.length > 0 ? accounts[0]: '' }></UserInfo>}
             {connectionState !== ConnectionState.CONNECTED && <Button type='primary' onClick={connect} >Connect</Button>}
         </Space>
     </div>;

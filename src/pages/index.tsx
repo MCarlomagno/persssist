@@ -10,6 +10,8 @@ import { Projects } from '../components/projects/Projects'
 import "antd/dist/antd.css";
 import { Header } from '../components/header/header'
 import { PersssistFile } from '../interfaces/persssist-file.interface'
+import { Provider } from 'react-redux'
+import store from '../store';
 
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
 declare let window: any;
@@ -30,9 +32,9 @@ const Home: NextPage = () => {
 
     const loadWeb3 = async () => {
       window.ipfs = ipfs;
+      console.log(window.ethereum)
       if (window.ethereum) {
         window.web3 = new Web3(window.ethereum)
-        await window.ethereum.enable()
         setMetamaskEnabled(true);
       } 
       else if (window.web3) {
@@ -133,9 +135,12 @@ const Home: NextPage = () => {
         <meta name="description" content="Desentralized storage for free and forever" />
         <link rel="icon" href="favicon.ico" />
       </Head>
-      <NavBar></NavBar>
-      <Header contract={contract} ipfs={ipfs} account={account} enabled={metamaskEnabled}></Header>
-      <Projects files={files} onDownload={downloadFile} contract={contract} ipfs={ipfs} account={account}></Projects>
+      <Provider store={store}>
+        <NavBar></NavBar>
+        <Header contract={contract} ipfs={ipfs} account={account} enabled={metamaskEnabled}></Header>
+        <Projects files={files} onDownload={downloadFile} contract={contract} ipfs={ipfs} account={account}></Projects>
+      </Provider>
+
     </div>
   )
 }
