@@ -27,10 +27,17 @@ export const accounts = createSlice({
 export const { setAccounts, setConnectionstate } = accounts.actions;
 export default accounts.reducer;
 
+const getAccountState = (accounts: string[]) => {
+    if(!window.ethereum) return ConnectionState.UNAVAILABLE;
+    if(accounts.length === 0) return ConnectionState.DISCONNECTED
+    else return ConnectionState.DISCONNECTED
+} 
+
 export const fetchAccounts = () => (dispatch: any) => {
     window.ethereum.request({ method: "eth_accounts" })
         .then((accounts: string[]) => {
-            dispatch(setConnectionstate(accounts.length > 0 ? ConnectionState.CONNECTED : ConnectionState.DISCONNECTED))
+            const state = getAccountState(accounts);
+            dispatch(setConnectionstate(state))
             return dispatch(setAccounts(accounts));
         })
         .catch((err: any) => console.log(err));
@@ -39,7 +46,8 @@ export const fetchAccounts = () => (dispatch: any) => {
 export const requestAccounts = () => (dispatch: any) => {
     window.ethereum.request({ method: "eth_requestAccounts" })
         .then((accounts: string[]) => {
-            dispatch(setConnectionstate(accounts.length > 0 ? ConnectionState.CONNECTED : ConnectionState.DISCONNECTED))
+            const state = getAccountState(accounts);
+            dispatch(setConnectionstate(state))
             return dispatch(setAccounts(accounts));
         })
         .catch((err: any) => console.log(err));
