@@ -5,21 +5,27 @@ import {InboxOutlined, UploadOutlined} from '@ant-design/icons';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { IFile } from '../../interfaces/ifile.interface';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { IPFSHTTPClient } from 'ipfs-http-client';
 const { Text, Title } = Typography;
 const { Dragger } = Upload;
 
 interface Props {
     contract: any;
-    ipfs: any;
-    account: string | undefined;
     enabled: boolean;
 }
 
-export const Header: NextPage<Props> = ({ contract, ipfs, account, enabled }) => {
+export const Header: NextPage<Props> = ({ contract, enabled }) => {
+
+    const { ipfs } = useSelector((state: RootState) => state.storage)
 
     let [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [file, setFile] = useState<IFile | null>();
+    const { list } = useSelector((state: RootState) => {
+        return state.accounts
+    })
 
     const closeModal = () => setIsOpen(false);
     const openModal = () => setIsOpen(true);
@@ -47,8 +53,8 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account, enabled }) =>
         setIsLoading(false);
     }
 
-    const onSubmit = async () => {
-        if (!file || !file.buffer || !contract) return;
+    const onSubmit = async (ipfs: IPFSHTTPClient | undefined) => {
+        if (!file || !file.buffer || !contract || !ipfs) return;
         setIsLoading(true);
         const blob = new Blob([file.buffer], { type: file.type });
         const result = await ipfs.add(blob);
@@ -58,7 +64,7 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account, enabled }) =>
             result.size,
             file.type,
             file.name,
-        ).send({ from: account })
+        ).send({ from: list[0] })
             .on('transactionHash', onUploadSuccess)
             .on('error', onUploadError)
     }
@@ -71,13 +77,13 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account, enabled }) =>
                     Decentralized blockchain platform for uploading, downloading and sharing files without any restriction.
                 </Text>
                 <div className='flex justify-center mt-5'>
-                <Button type="primary" disabled={!enabled || !account} icon={<UploadOutlined />} onClick={openModal}>Start sharing</Button>
+                <Button type="primary" disabled={!enabled || list.length === 0} icon={<UploadOutlined />} onClick={openModal}>Share files</Button>
                 </div>
             </div>
 
             <Divider/>
                         
-            <Modal title="Upload File" visible={isOpen} footer={false} destroyOnClose={true} onOk={onSubmit} onCancel={closeModal}>
+            <Modal title="Upload File" visible={isOpen} footer={false} destroyOnClose={true} onCancel={closeModal}>
                 <Dragger name={'file'} onChange={onFileChange} action={'/api/hello'}>
                     <p className="ant-upload-drag-icon">
                     <InboxOutlined />
@@ -90,7 +96,7 @@ export const Header: NextPage<Props> = ({ contract, ipfs, account, enabled }) =>
                 <Row className='mt-4'>
                     <Col offset={15}>
                         <Button onClick={closeModal} type="text">Cancel</Button>
-                        <Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={onSubmit}>Upload</Button>
+                        <Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={() => onSubmit(ipfs)}>Upload</Button>
                     </Col>
                 </Row>
             </Modal>

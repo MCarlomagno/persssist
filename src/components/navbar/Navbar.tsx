@@ -9,7 +9,7 @@ import { UserInfo } from './user/user-info'
 import { Button, Space } from 'antd'
 import { Grid } from 'antd'
 
-import { fetchAccounts } from '../../store/slices/accounts'
+import { fetchAccounts, requestAccounts } from '../../store/slices/accounts'
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store'
 // For recognizing ethereum as part of the
@@ -20,33 +20,16 @@ const { useBreakpoint } = Grid;
 
 export const NavBar: NextPage = () => {
 
-    const [connectionState, setConnectionState] = useState(ConnectionState.DISCONNECTED);
-    const [userAddress, setUserAddress] = useState("")
     const screens = useBreakpoint()
-    const dispatch = useDispatch();
-    const accounts = useSelector((state: RootState) => {
-        return state.accountSlice.list
-    })
+    const dispatch = useDispatch()
+    const { connectionState } = useSelector((state: RootState) => state.accounts)
 
     useEffect(() => {
-        async function listenMetamask() { 
-            window.ethereum?.on('accountsChanged', initializeAccount);
-        }
-        listenMetamask();
-        initializeAccount();
+        window.ethereum?.on('accountsChanged', fetchAccounts);
     }, []);
 
-    async function initializeAccount() {
-        if (!window.ethereum) return setConnectionState(ConnectionState.UNAVAILABLE);
-        dispatch(fetchAccounts());
-        return setConnectionState(ConnectionState.CONNECTED);
-    }
-
     async function connect() {
-        const accounts = await window.ethereum.request({
-            method: "eth_requestAccounts",
-        });
-        setUserAddress(accounts[0]);
+        dispatch(requestAccounts());
     }
 
     const MobileMenuButton = (open: boolean) => <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -68,7 +51,7 @@ export const NavBar: NextPage = () => {
         
         <Space size={'middle'}>
             {connectionState !== ConnectionState.CONNECTED && <ConnectionStateIcon connectionState={connectionState}></ConnectionStateIcon>}
-            {connectionState === ConnectionState.CONNECTED && <UserInfo address={ accounts?.length > 0 ? accounts[0]: '' }></UserInfo>}
+            {connectionState === ConnectionState.CONNECTED && <UserInfo></UserInfo>}
             {connectionState !== ConnectionState.CONNECTED && <Button type='primary' onClick={connect} >Connect</Button>}
         </Space>
     </div>;
@@ -79,7 +62,7 @@ export const NavBar: NextPage = () => {
                 <>
                     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
                         <div className="relative flex items-center justify-between h-16">
-                            {connectionState !== ConnectionState.CONNECTED &&  MobileMenuButton(open)}
+                            {connectionState !== ConnectionState.CONNECTED && MobileMenuButton(open)}
                             <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                                 {Logo()}
                             </div>

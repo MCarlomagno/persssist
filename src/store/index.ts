@@ -1,21 +1,21 @@
 import { combineReducers, configureStore} from '@reduxjs/toolkit';
-import accountSlice from './slices/accounts';
+import accounts from './slices/accounts';
+import storage from './slices/storage';
+
+const reducers = {
+  accounts,
+  storage
+}
 
 export function makeStore() {
   return configureStore({
-    reducer: { 
-      accountSlice
-    },
+    reducer: reducers
   });
 }
 
-export const rootReducer = combineReducers({
-  accounts: accountSlice,
-});
+export const rootReducer = combineReducers(reducers);
 
 const store = makeStore();
-
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
-
-export default store
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export default store;
