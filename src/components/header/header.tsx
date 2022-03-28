@@ -7,18 +7,14 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import { IFile } from '../../interfaces/ifile.interface';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { IPFSHTTPClient } from 'ipfs-http-client';
+import { uploadFile } from '../../store/slices/blockchain';
 const { Text, Title } = Typography;
 const { Dragger } = Upload;
 
 interface Props {
-    contract: any;
-    enabled: boolean;
 }
 
-export const Header: NextPage<Props> = ({ contract, enabled }) => {
-
-    const { ipfs } = useSelector((state: RootState) => state.storage)
+export const Header: NextPage<Props> = () => {
 
     let [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -53,21 +49,13 @@ export const Header: NextPage<Props> = ({ contract, enabled }) => {
         setIsLoading(false);
     }
 
-    const onSubmit = async (ipfs: IPFSHTTPClient | undefined) => {
-        if (!file || !file.buffer || !contract || !ipfs) return;
-        setIsLoading(true);
-        const blob = new Blob([file.buffer], { type: file.type });
-        const result = await ipfs.add(blob);
-
-        contract.methods.uploadFile(
-            result.path,
-            result.size,
-            file.type,
-            file.name,
-        ).send({ from: list[0] })
-            .on('transactionHash', onUploadSuccess)
-            .on('error', onUploadError)
+    const onSubmit = async () => {
+			setIsLoading(true);
+			const result = await uploadFile(file, list[0])
+			result.on('transactionHash', onUploadSuccess).on('error', onUploadError)
     }
+
+
 
     return (
         <div className="align-center">
@@ -77,7 +65,7 @@ export const Header: NextPage<Props> = ({ contract, enabled }) => {
                     Decentralized blockchain platform for uploading, downloading and sharing files without any restriction.
                 </Text>
                 <div className='flex justify-center mt-5'>
-                <Button type="primary" disabled={!enabled || list.length === 0} icon={<UploadOutlined />} onClick={openModal}>Share files</Button>
+                <Button type="primary" disabled={list.length === 0} icon={<UploadOutlined />} onClick={openModal}>Share files</Button>
                 </div>
             </div>
 
@@ -96,7 +84,7 @@ export const Header: NextPage<Props> = ({ contract, enabled }) => {
                 <Row className='mt-4'>
                     <Col offset={15}>
                         <Button onClick={closeModal} type="text">Cancel</Button>
-                        <Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={() => onSubmit(ipfs)}>Upload</Button>
+                        <Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={() => onSubmit()}>Upload</Button>
                     </Col>
                 </Row>
             </Modal>

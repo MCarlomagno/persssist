@@ -1,10 +1,10 @@
 import { combineReducers, configureStore} from '@reduxjs/toolkit';
 import accounts from './slices/accounts';
-import storage from './slices/storage';
+import blockchain from './slices/blockchain';
 
 const reducers = {
   accounts,
-  storage
+  blockchain
 }
 
 export function makeStore() {

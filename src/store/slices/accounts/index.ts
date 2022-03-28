@@ -47,6 +47,7 @@ export const requestAccounts = () => (dispatch: any) => {
     window.ethereum.request({ method: "eth_requestAccounts" })
         .then((accounts: string[]) => {
             const state = getAccountState(accounts);
+            console.log(state);
             dispatch(setConnectionstate(state))
             return dispatch(setAccounts(accounts));
         })
