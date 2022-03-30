@@ -70,9 +70,8 @@ export class AppBlockchain {
             .catch((err: any) => console.log(err));
     }
 
-    async detectAccountChanged() {
-        window.ethereum.on('accountsChanged', (accounts: string[]) => {
-        })
+    async detectAccountChanged(onChanged: (acc: string[]) => void) {
+        window.ethereum.on('accountsChanged', onChanged);
     }
 
     async detectNetworkChanged(onError: (err: any) => void) {

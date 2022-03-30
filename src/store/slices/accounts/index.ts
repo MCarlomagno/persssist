@@ -60,7 +60,7 @@ export const connectAccount = (errorCallback: (e: any) => void) => (dispatch: an
                             title: 'No Account detected',
                             msg: 'Please make sure to connect a Metamask account'
                         })
-                    } 
+                    }
                     dispatch(setAccounts(acc));
                     dispatch(setConnectionstate(connectionState(acc)));
                 });

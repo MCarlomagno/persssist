@@ -3,6 +3,7 @@ import { IFile } from '../../../interfaces/ifile.interface';
 import { PersssistFile } from '../../../interfaces/persssist-file.interface';
 import { AppBlockchain } from '../../../lib/blockchain';
 import { AppStorage } from '../../../lib/storage';
+import { connectAccount } from '../accounts';
 
 const appBlockchain = new AppBlockchain();
 const appStorage = new AppStorage();
@@ -30,9 +31,12 @@ export const fetchFilesMetadata = () => async (dispatch: any) => {
 }
 
 export const subscribeToEvents = (errorCallback: (e: any) => void) => (dispatch: any) => {
-	const onData = () => dispatch(fetchFilesMetadata());
+	const onAccountChanged = () => dispatch(connectAccount(errorCallback));
+	const onContractUpdated = () => dispatch(fetchFilesMetadata());
+
+	appBlockchain.detectAccountChanged(onAccountChanged)
 	appBlockchain.detectNetworkChanged(errorCallback)
-	appBlockchain.contractSubscription(onData)
+	appBlockchain.contractSubscription(onContractUpdated)
 		.catch(errorCallback);
 }
 
