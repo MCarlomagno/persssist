@@ -28,9 +28,10 @@ export const fetchFilesMetadata = () => async (dispatch: any) => {
 	dispatch(setFilesMetadata(filesMetadata));
 }
 
-export const subscribeToEvents = () => (dispatch: any) => {
+export const subscribeToEvents = (errorCallback: (e: any) => void) => (dispatch: any) => {
 	const onData = () => dispatch(fetchFilesMetadata());
 	appBlockchain.contractSubscription(onData)
+		.catch(errorCallback);
 }
 
 export const uploadFile = async (

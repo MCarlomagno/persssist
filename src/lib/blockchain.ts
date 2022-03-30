@@ -3,6 +3,7 @@
 import Web3 from "web3";
 import Persssist from '../../public/abis/Persssist.json'
 import PersssistLocal from '../../abis/Persssist.json'
+import { NetwokIds } from "../constants/networks";
 
 
 export class AppBlockchain {
@@ -10,9 +11,7 @@ export class AppBlockchain {
     web3: Web3 | undefined;
     initialized = false;
 
-    constructor() {
-        this.initialize();
-    }
+    constructor() {}
 
     private async ensureInitialized() {
         if(!this.initialized) {
@@ -29,7 +28,6 @@ export class AppBlockchain {
         onSuccess: (hash: string) => void,
         onError: (e: any) => void,
     ) {
-        await this.ensureInitialized();
         return this.contract.methods
             .uploadFile(path, size, type, name)
             .send({ from: account })
@@ -37,8 +35,7 @@ export class AppBlockchain {
             .on('error', onError);
     }
 
-    async getFilesMetadata(): Promise<any[]> { 
-        await this.ensureInitialized();
+    async getFilesMetadata(): Promise<any[]> {
         const methods = this.contract.methods;
         const filesCount = await methods.fileCount().call();
         const filesMetadata = [];
@@ -77,7 +74,7 @@ export class AppBlockchain {
             await this.initializeContractLocal();
         }
         if (process.env.NEXT_PUBLIC_MODE === 'PROD') {
-            this.initializeContractRemote();
+            await this.initializeContractRemote();
         }
     }
 
@@ -93,8 +90,15 @@ export class AppBlockchain {
         }
     }
 
-    private initializeContractRemote() {
+    private async initializeContractRemote() {
         if(!this.web3) throw 'Web3 not initialized';
+        const networkId = await this.web3.eth.net.getId();
+        if(networkId !== NetwokIds.kovan) {
+            throw { 
+                title: 'Network not supported', 
+                msg: 'Please make sure to connect to the Kovan Network'
+            }
+        }
         this.contract = new this.web3.eth.Contract(
             (Persssist as any),
             process.env.NEXT_PUBLIC_CONTRACT
