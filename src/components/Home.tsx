@@ -7,12 +7,14 @@ import { Header } from './header/header';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { subscribeToEvents } from '../store/slices/blockchain';
+import { connectAccount } from '../store/slices/accounts';
 
 const Home: NextPage = () => {
   const {filesMetadata} = useSelector((store: RootState) => store.blockchain);
 	const dispatch = useDispatch()
   
   useEffect(() => {
+    dispatch(connectAccount());
     dispatch(subscribeToEvents());
 	}, []);
 
