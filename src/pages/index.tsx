@@ -3,7 +3,14 @@ import Head from 'next/head'
 import "antd/dist/antd.css";
 import { Provider } from 'react-redux'
 import store from '../store';
-import Home from './Home'
+import Home from '../components/Home'
+
+declare global {
+  interface Window { 
+    ethereum: any; 
+    web3:any; 
+  }
+}
 
 const Index: NextPage = () => {
   return (

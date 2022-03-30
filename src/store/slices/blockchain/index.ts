@@ -1,20 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import Web3 from 'web3';
-import Persssist from '../../../../public/abis/Persssist.json'
-import PersssistLocal from '../../../../abis/Persssist.json'
-import {  create, IPFSHTTPClient } from 'ipfs-http-client';
 import { IFile } from '../../../interfaces/ifile.interface';
+import { AppBlockchain } from '../../../lib/blockchain';
+import { AppStorage } from '../../../lib/storage';
 
-declare let window: any;
-
-const web3Tools = {
-	ipfs: create({ 
-		host: 'ipfs.infura.io', 
-		port: 5001, 
-		protocol: 'https' 
-}) as IPFSHTTPClient,
-	contract: null as any,
-}
+const appBlockchain = new AppBlockchain();
+const appStorage = new AppStorage();
 
 export const blockchain = createSlice({
 	name: 'blockchain',
@@ -28,76 +18,36 @@ export const blockchain = createSlice({
 			state.filesCount = action.payload.length;
 		}
 	},
-	
 });
 
 export const { setFilesMetadata } = blockchain.actions;
 export default blockchain.reducer;
 
-const initializeState = () => async (dispatch: any) => {
-	if(!web3Tools.contract) return;
-	const methods = web3Tools.contract.methods;
-
-	const filesCount = await methods.fileCount().call();
-	const filesMetadata = [];
-	for (var i = filesCount; i >= 1; i--) {
-		const file = await methods.files(i).call()
-		filesMetadata.push(file);
-	}
-
-	dispatch(setFilesMetadata(setFilesMetadata));
+export const fetchFilesMetadata = () => async (dispatch: any) => {
+	const filesMetadata = await appBlockchain.getFilesMetadata();
+	dispatch(setFilesMetadata(filesMetadata));
 }
 
-const subscribeToEvents = () => {
-	if(!web3Tools.contract) return;
-	web3Tools.contract.events.FileUploaded()
-		.on('data', (event: any) => initializeState())
-		.on('changed', (changed: any) => console.log(changed))
-		.on('error', (err: any) => console.log(err))
-		.on('connected', (str: any) => initializeState())
+export const subscribeToEvents = () => (dispatch: any) => {
+	const onData = () => dispatch(fetchFilesMetadata());
+	appBlockchain.contractSubscription(onData)
 }
 
-export const initializeWeb3 = () => async (dispatch: any) => {
-	var web3 = null;
-	// initialize web3
-	if (window.ethereum) web3 = new Web3(window.ethereum)
-	else if (window.web3) web3 = new Web3(window.web3.currentProvider);
-
-	if(web3) {
-		// initialize smart contract
-		if(process.env.NEXT_PUBLIC_MODE === 'DEV') {
-			const networkId = await web3.eth.net.getId();
-			const networkData = (PersssistLocal as any).networks[networkId];
-			var contract = null
-				if (networkData) {
-					contract = new web3.eth.Contract(
-					(PersssistLocal as any).abi, 
-					networkData.address
-					)
-				}
-			}
-			
-			if(process.env.NEXT_PUBLIC_MODE === 'PROD') {
-				contract = new web3.eth.Contract(
-					(Persssist as any),
-					process.env.NEXT_PUBLIC_CONTRACT
-				);
-			}
-			web3Tools.contract = contract;
-			initializeState();
-			subscribeToEvents();
-	}
-};
-
-export const uploadFile = async (file: IFile | null | undefined, account: String) => {
-	if (!file || !file.buffer || !web3Tools.contract || !web3Tools.ipfs) return;
-	const blob = new Blob([file.buffer], { type: file.type });
-	const result = await web3Tools.ipfs.add(blob);
-
-	return web3Tools.contract.methods.uploadFile(
-			result.path,
-			result.size,
-			file.type,
-			file.name,
+export const uploadFile = async (
+	file: IFile | null | undefined, 
+	account: string, 
+	successCallback: (hash: string) => void, 
+	errorCallback: (e: any) => void
+) => {
+	if(!file) throw 'file not provided';
+	const addResult = await appStorage.upload(file);
+	return appBlockchain.uploadFileMetadata(
+		addResult.path,
+		addResult.size,
+		file.type,
+		file.name, 
+		account,
+		successCallback,
+		errorCallback
 	);
 }

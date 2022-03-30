@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ConnectionState } from '../../../enums/connection-state';
+import { AppBlockchain } from '../../../lib/blockchain';
 
-declare let window: any;
+const blockchain = new AppBlockchain();
 
 export const accounts = createSlice({
     name: 'accounts',
@@ -14,8 +15,9 @@ export const accounts = createSlice({
             state.list = [...action.payload];
         },
         setConnectionstate: (state, action) => {
+            if(typeof window === "undefined") return;
             if(window.ethereum) {
-                state.connectionState = action.payload ;
+                state.connectionState = action.payload;
             }else {
                 state.connectionState = ConnectionState.UNAVAILABLE;
             }
@@ -27,29 +29,19 @@ export const accounts = createSlice({
 export const { setAccounts, setConnectionstate } = accounts.actions;
 export default accounts.reducer;
 
-const getAccountState = (accounts: string[]) => {
-    if(!window.ethereum) return ConnectionState.UNAVAILABLE;
-    if(accounts.length === 0) return ConnectionState.DISCONNECTED
-    else return ConnectionState.DISCONNECTED
-} 
-
-export const fetchAccounts = () => (dispatch: any) => {
-    window.ethereum.request({ method: "eth_accounts" })
-        .then((accounts: string[]) => {
-            const state = getAccountState(accounts);
-            dispatch(setConnectionstate(state))
-            return dispatch(setAccounts(accounts));
-        })
-        .catch((err: any) => console.log(err));
+const connectionState = (accounts: string[]) => {
+    if(typeof window === "undefined") return;
+    if(window.ethereum) {
+        return accounts.length > 0 ? ConnectionState.CONNECTED : ConnectionState.DISCONNECTED;
+    } else {
+        return ConnectionState.UNAVAILABLE;
+    }
 }
 
-export const requestAccounts = () => (dispatch: any) => {
-    window.ethereum.request({ method: "eth_requestAccounts" })
-        .then((accounts: string[]) => {
-            const state = getAccountState(accounts);
-            console.log(state);
-            dispatch(setConnectionstate(state))
-            return dispatch(setAccounts(accounts));
-        })
-        .catch((err: any) => console.log(err));
+export const connectAccount = () => (dispatch: any) => {
+    blockchain.fetchAccounts()
+        .then((acc: string[]) => {
+            dispatch(setAccounts(acc));
+            dispatch(setConnectionstate(connectionState(acc)));
+        });
 }

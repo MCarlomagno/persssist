@@ -1,7 +1,6 @@
 
 import { Col, Empty, Row } from 'antd';
 import { NextPage } from 'next'
-import { useSelector } from 'react-redux';
 import { PersssistFile } from '../../interfaces/persssist-file.interface';
 import { FileCard } from './file-card'
 
