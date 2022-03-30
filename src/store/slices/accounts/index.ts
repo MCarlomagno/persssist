@@ -38,16 +38,32 @@ const connectionState = (accounts: string[]) => {
     }
 }
 
-export const connectAccount = (errorCallback: (e: any) => void) => (dispatch: any) => {
-    blockchain.fetchAccounts()
-        .then((acc: string[]) => {
-            if(acc.length === 0) {
-                return errorCallback({
-                    title: 'No Account Detected',
-                    msg: 'Please, make sure that you have Metamask extension installed with a connected account.'
-                });
-            }
+export const checkExistingAccounts = () => (dispatch: any) => {
+    blockchain.fetchAccounts().then((acc: string[]) => {
+        if(acc && acc.length > 0) {
             dispatch(setAccounts(acc));
             dispatch(setConnectionstate(connectionState(acc)));
-        });
+        }
+    });
+}
+
+export const connectAccount = (errorCallback: (e: any) => void) => (dispatch: any) => {
+    blockchain.fetchAccounts().then((acc: string[]) => {
+        if(acc && acc.length > 0) {
+            dispatch(setAccounts(acc));
+            dispatch(setConnectionstate(connectionState(acc)));
+        } else {
+            blockchain.requestAccounts()
+                .then((acc: string[]) => {
+                    if(!acc || acc.length === 0) {
+                        return errorCallback({
+                            title: 'No Account detected',
+                            msg: 'Please make sure to connect a Metamask account'
+                        })
+                    } 
+                    dispatch(setAccounts(acc));
+                    dispatch(setConnectionstate(connectionState(acc)));
+                });
+        }
+    });
 }

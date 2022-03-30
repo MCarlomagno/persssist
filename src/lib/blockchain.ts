@@ -56,6 +56,13 @@ export class AppBlockchain {
         return filesMetadata;
     }
 
+    async requestAccounts() {
+        if(typeof window === "undefined") return;
+        return window
+            .ethereum?.request({ method: "eth_requestAccounts" })
+            .catch((err: any) => console.log(err));
+    }
+
     async fetchAccounts() {
         if(typeof window === "undefined") return;
         return window
@@ -63,12 +70,22 @@ export class AppBlockchain {
             .catch((err: any) => console.log(err));
     }
 
+    async detectAccountChanged() {
+        window.ethereum.on('accountsChanged', (accounts: string[]) => {
+        })
+    }
+
+    async detectNetworkChanged(onError: (err: any) => void) {
+        window.ethereum.on('networkChanged', (networkId: number) => {
+            this.initializeContract(onError);
+        });
+    }
+
     private async initialize() {
         if(typeof window === "undefined") return;
         this.initializeWeb3();
         if (this.web3) {
-            await this.initializeContract();
-            window.ethereum?.on('accountsChanged', this.fetchAccounts);
+            await this.initializeContract((err) => {});
         }
         this.initialized = true;
     }
@@ -79,12 +96,12 @@ export class AppBlockchain {
         else if (window.web3) this.web3 = new Web3(window.web3.currentProvider);
     }
 
-    private async initializeContract() {
+    private async initializeContract(onError: (err: any) => void) {
         if (process.env.NEXT_PUBLIC_MODE === 'DEV') {
-            await this.initializeContractLocal();
+            return this.initializeContractLocal().catch(onError);
         }
         if (process.env.NEXT_PUBLIC_MODE === 'PROD') {
-            await this.initializeContractRemote();
+            return this.initializeContractRemote().catch(onError);
         }
     }
 
@@ -108,15 +125,17 @@ export class AppBlockchain {
                 title: 'Network not supported', 
                 msg: 'Please make sure to connect to the Kovan Network'
             }
+        } else {
+            this.contract = new this.web3.eth.Contract(
+                (Persssist as any),
+                process.env.NEXT_PUBLIC_CONTRACT
+            );
         }
-        this.contract = new this.web3.eth.Contract(
-            (Persssist as any),
-            process.env.NEXT_PUBLIC_CONTRACT
-        );
     }
 
     async contractSubscription(onData: () => any) {
         await this.ensureInitialized();
+        if(!this.contract) return;
         this.contract.events.FileUploaded()		
             .on('data', (event: any) => onData())
             .on('changed', (changed: any) => console.log(changed))

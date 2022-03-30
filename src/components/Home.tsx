@@ -7,7 +7,7 @@ import { Header } from './header/header';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { subscribeToEvents } from '../store/slices/blockchain';
-import { connectAccount } from '../store/slices/accounts';
+import { checkExistingAccounts } from '../store/slices/accounts';
 import { IError } from '../interfaces/ierror.interface';
 import { notification } from 'antd';
 
@@ -23,7 +23,7 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
-    dispatch(connectAccount(onError));
+    dispatch(checkExistingAccounts());
     dispatch(subscribeToEvents(onError));
 	}, []);
 

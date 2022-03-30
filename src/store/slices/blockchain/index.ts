@@ -31,6 +31,7 @@ export const fetchFilesMetadata = () => async (dispatch: any) => {
 
 export const subscribeToEvents = (errorCallback: (e: any) => void) => (dispatch: any) => {
 	const onData = () => dispatch(fetchFilesMetadata());
+	appBlockchain.detectNetworkChanged(errorCallback)
 	appBlockchain.contractSubscription(onData)
 		.catch(errorCallback);
 }
