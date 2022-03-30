@@ -5,21 +5,29 @@ import Image from 'next/image';
 import { ConnectionState } from '../../enums/connection-state';
 import { ConnectionStateIcon } from './connection-state-icon';
 import { UserInfo } from './user/user-info';
-import { Button, Space } from 'antd';
+import { Button, notification, Space } from 'antd';
 import { Grid } from 'antd';
 
 import { connectAccount } from '../../store/slices/accounts';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import { IError } from '../../interfaces/ierror.interface';
 
 const { useBreakpoint } = Grid;
 
 export const NavBar: NextPage = () => {
 
+	const onError = (err: IError) => {
+    notification.error({
+      message: err.title,
+      description: err.msg,
+    });
+  }
+
 	const screens = useBreakpoint();
 	const dispatch = useDispatch();
 	const { connectionState } = useSelector((state: RootState) => state.accounts);	
-	const connect = () => dispatch(connectAccount());
+	const connect = () => dispatch(connectAccount(onError));
 	const connected = connectionState === ConnectionState.CONNECTED;
 
 	return (

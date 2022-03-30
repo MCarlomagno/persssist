@@ -23,7 +23,7 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
-    dispatch(connectAccount());
+    dispatch(connectAccount(onError));
     dispatch(subscribeToEvents(onError));
 	}, []);
 

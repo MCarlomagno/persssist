@@ -38,9 +38,15 @@ const connectionState = (accounts: string[]) => {
     }
 }
 
-export const connectAccount = () => (dispatch: any) => {
+export const connectAccount = (errorCallback: (e: any) => void) => (dispatch: any) => {
     blockchain.fetchAccounts()
         .then((acc: string[]) => {
+            if(acc.length === 0) {
+                return errorCallback({
+                    title: 'No Account Detected',
+                    msg: 'Please, make sure that you have Metamask extension installed with a connected account.'
+                });
+            }
             dispatch(setAccounts(acc));
             dispatch(setConnectionstate(connectionState(acc)));
         });
