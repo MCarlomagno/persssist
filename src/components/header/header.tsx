@@ -1,5 +1,5 @@
-import { Button, Upload, message, Space, Row, Col, Modal, PageHeader, Divider, Typography } from 'antd';
-import { NextPage } from 'next'
+import { Button, Upload, message, Row, Col, Modal, Divider, Typography } from 'antd';
+import { NextPage } from 'next';
 import { useState } from 'react';
 import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import { UploadChangeParam } from 'antd/lib/upload';
@@ -62,7 +62,13 @@ export const Header: NextPage<Props> = () => {
 					Decentralized blockchain platform for uploading, downloading and sharing files without any restriction.
 				</Text>
 				<div className='flex justify-center mt-5'>
-					<Button type="primary" disabled={list.length === 0} icon={<UploadOutlined />} onClick={openModal}>Share files</Button>
+					<Button 
+						type="primary" 
+						disabled={list.length === 0} 
+						icon={<UploadOutlined />} 
+						onClick={openModal}>
+							Share files
+					</Button>
 				</div>
 			</div>
 
@@ -73,7 +79,9 @@ export const Header: NextPage<Props> = () => {
 					<p className="ant-upload-drag-icon">
 						<InboxOutlined />
 					</p>
-					<p className="ant-upload-text">Click or drag file to this area to upload</p>
+					<p className="ant-upload-text">
+						Click or drag file to this area to upload
+					</p>
 					<p className="ant-upload-hint">
 						Support for a single file.
 					</p>
@@ -81,7 +89,13 @@ export const Header: NextPage<Props> = () => {
 				<Row className='mt-4'>
 					<Col offset={15}>
 						<Button onClick={closeModal} type="text">Cancel</Button>
-						<Button type="primary" loading={isLoading} icon={<UploadOutlined />} onClick={() => onSubmit()}>Upload</Button>
+						<Button 
+						type="primary" 
+						loading={isLoading} 
+						icon={<UploadOutlined />} 
+						onClick={() => onSubmit()}>
+							Upload
+						</Button>
 					</Col>
 				</Row>
 			</Modal>
