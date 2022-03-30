@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { IFile } from '../../../interfaces/ifile.interface';
+import { PersssistFile } from '../../../interfaces/persssist-file.interface';
 import { AppBlockchain } from '../../../lib/blockchain';
 import { AppStorage } from '../../../lib/storage';
 
@@ -9,7 +10,7 @@ const appStorage = new AppStorage();
 export const blockchain = createSlice({
 	name: 'blockchain',
 	initialState: {
-		filesMetadata: [],
+		filesMetadata: [] as PersssistFile[],
 		filesCount: 0,
 	},
 	reducers: {

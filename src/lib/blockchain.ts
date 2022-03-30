@@ -4,12 +4,15 @@ import Web3 from "web3";
 import Persssist from '../../public/abis/Persssist.json'
 import PersssistLocal from '../../abis/Persssist.json'
 import { NetwokIds } from "../constants/networks";
+import { PersssistFile } from "../interfaces/persssist-file.interface";
 
 
 export class AppBlockchain {
     contract: any;
     web3: Web3 | undefined;
     initialized = false;
+
+    supportedNetworks = [NetwokIds.kovan];
 
     constructor() {}
 
@@ -35,13 +38,20 @@ export class AppBlockchain {
             .on('error', onError);
     }
 
-    async getFilesMetadata(): Promise<any[]> {
+    async getFilesMetadata(): Promise<PersssistFile[]> {
         const methods = this.contract.methods;
         const filesCount = await methods.fileCount().call();
-        const filesMetadata = [];
+        const filesMetadata: PersssistFile[] = [];
         for (var i = filesCount; i >= 1; i--) {
             const file = await methods.files(i).call()
-            filesMetadata.push(file);
+            filesMetadata.push({
+                fileId: file.id, 
+                fileName: file.fileName, 
+                filePath: file.filePath, 
+                fileSize: file.fileSize, 
+                fileType: file.fileType, 
+                uploader: file.uploader
+            });
         }
         return filesMetadata;
     }
@@ -93,8 +103,8 @@ export class AppBlockchain {
     private async initializeContractRemote() {
         if(!this.web3) throw 'Web3 not initialized';
         const networkId = await this.web3.eth.net.getId();
-        if(networkId !== NetwokIds.kovan) {
-            throw { 
+        if(!this.supportedNetworks.includes(networkId)) {
+            throw {
                 title: 'Network not supported', 
                 msg: 'Please make sure to connect to the Kovan Network'
             }

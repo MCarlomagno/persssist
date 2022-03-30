@@ -13,7 +13,7 @@ import { notification } from 'antd';
 
 const Home: NextPage = () => {
   const {filesMetadata} = useSelector((store: RootState) => store.blockchain);
-	const dispatch = useDispatch()
+	const dispatch = useDispatch();
   
   const onError = (err: IError) => {
     notification.error({
