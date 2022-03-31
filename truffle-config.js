@@ -49,7 +49,7 @@ module.exports = {
         const privateKey = process.env.PRIVATE_KEY;
         return new HDWalletProvider(
           privateKey,
-          `wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`
+          `https://rinkeby.infura.io/v3/${infuraProjectId}`
         )
       },
       from: accountAddr,
