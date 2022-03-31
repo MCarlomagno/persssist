@@ -47,6 +47,8 @@ module.exports = {
     // timeout: 100000
   },
 
+  test_directory: './src/test',
+
   // Configure your compilers
   compilers: {
     solc: {
