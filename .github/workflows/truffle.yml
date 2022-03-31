@@ -1,0 +1,74 @@
+name: Truffle Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup NodeJS 16
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+    - name: Show NodeJS version    
+      run: npm --version
+    
+    - name: Install Truffle
+      run: npm install truffle@5.4.29 -g # cannot use truffle@latest due to https://github.com/sc-forks/solidity-coverage/issues/696
+    
+    - name: Install Truffle Dependencies
+      run: npm install      
+    
+    - name: Run Truffle Test with CI=true for Codechecks  
+      run: CI=true truffle test
+
+    - name: Run Codechecks
+      run: npx codechecks
+      env:
+        CC_SECRET: ${{ secrets.CC_SECRET }}  
+    
+    - name: Run Test Coverage
+      run: truffle run coverage
+    
+    - name: Setup Python 3.8  
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8 # Version range or exact version of a Python version to use, using SemVer's version range syntax
+        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+    - name: Show Python version
+      run: python --version
+    
+    - name: Clone SmartBugs Repo
+      run: git clone https://github.com/smartbugs/smartbugs.git
+    - name: Remove SmartBugs Results and Install SmartBugs Dependencies
+      run: cd smartbugs;rm -r results;pip install -r requirements.txt
+    - name: Run SmartBugs Analysis
+      run: |
+        solidityFiles=($(ls -I Migrations.sol contracts))
+        DIR=$(pwd);cd smartbugs
+        for sol in "${solidityFiles[@]}"
+        do
+          echo "Analysing $sol..."
+          python smartBugs.py --tool all --file $DIR/contracts/$sol
+        done
+           
+    - name: Move SmartBugs Results to Parent Directory
+      run: |
+        [[ -d results ]] && rm -r results
+        cd smartbugs
+        mv results ../
+    - name: Commit SmartBugs Results
+      uses: EndBug/add-and-commit@v7
+      with:
+        author_name: github-actions
+        author_email: action@github.com
+        message: 'chore: added smartbugs results'
+        add: 'results'
