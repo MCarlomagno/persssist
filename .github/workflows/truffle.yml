@@ -21,6 +21,9 @@ jobs:
     - name: Show NodeJS version    
       run: npm --version
     
+    - name: Create .env file
+      run: echo "${{ secrets.DOT_ENV }}" > .env
+    
     - name: Install Truffle
       run: npm install truffle@5.4.29 -g # cannot use truffle@latest due to https://github.com/sc-forks/solidity-coverage/issues/696
     

@@ -25,6 +25,7 @@
 require('dotenv').config()
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const infuraProjectId = process.env.INFURA_PROJECT_ID
+const accountAddr = process.env.ACCOUNT_ADDRESS;
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -50,7 +51,7 @@ module.exports = {
           `https://kovan.infura.io/v3/${infuraProjectId}`
         )
       },
-      from: '0x566bF04539C9Bf5eF1fa99d83e29453AD87bcA45',
+      from: accountAddr,
       network_id: 42, // Kovan's id
       networkCheckTimeoutnetworkCheckTimeout: 10000,
       timeoutBlocks: 200,
@@ -63,7 +64,7 @@ module.exports = {
           `wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`
         )
       },
-      from: '0x566bF04539C9Bf5eF1fa99d83e29453AD87bcA45',
+      from: accountAddr,
       network_id: 4, // Rinkeby's id
       networkCheckTimeoutnetworkCheckTimeout: 10000,
       timeoutBlocks: 200,
