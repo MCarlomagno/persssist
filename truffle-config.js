@@ -22,7 +22,9 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-
+require('dotenv').config()
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const infuraProjectId = process.env.INFURA_PROJECT_ID
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -39,12 +41,41 @@ module.exports = {
       host: "localhost",
       port: 7545,
       network_id: "*" // Match any network id
-    }
+    },
+    kovan: {
+      provider: () => {
+        const privateKey = process.env.PRIVATE_KEY;
+        return new HDWalletProvider(
+          privateKey,
+          `https://kovan.infura.io/v3/${infuraProjectId}`
+        )
+      },
+      from: '0x566bF04539C9Bf5eF1fa99d83e29453AD87bcA45',
+      network_id: 42, // Kovan's id
+      networkCheckTimeoutnetworkCheckTimeout: 10000,
+      timeoutBlocks: 200,
+    },
+    rinkeby: {
+      provider: () => {
+        const privateKey = process.env.PRIVATE_KEY;
+        return new HDWalletProvider(
+          privateKey,
+          `wss://rinkeby.infura.io/ws/v3/${infuraProjectId}`
+        )
+      },
+      from: '0x566bF04539C9Bf5eF1fa99d83e29453AD87bcA45',
+      network_id: 4, // Rinkeby's id
+      networkCheckTimeoutnetworkCheckTimeout: 10000,
+      timeoutBlocks: 200,
+    },
   },
 
   // Set default mocha options here, use special reporters etc.
   mocha: {
-    // timeout: 100000
+    reporter: 'eth-gas-reporter',
+    reporterOptions: {
+      excludeContracts: ['Migrations']
+    }
   },
 
   test_directory: './src/test',

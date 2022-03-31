@@ -28,4 +28,4 @@ jobs:
       run: npm install      
     
     - name: Run Truffle Test with CI=true for Codechecks  
-      run: truffle test
+      run: truffle test --network rinkeby
