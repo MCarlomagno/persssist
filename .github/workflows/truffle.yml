@@ -24,9 +24,9 @@ jobs:
     - name: Create env file
       run: |
         touch .env
-        echo INFURA_PROJECT_ID=${{ secrets.INFURA_PROJECT_ID }} > .env
-        echo PRIVATE_KEY=${{ secrets.PRIVATE_KEY }} > .env
-        echo ACCOUNT_ADDRESS=${{ secrets.ACCOUNT_ADDRESS }} > .env
+        echo INFURA_PROJECT_ID=${{ secrets.INFURA_PROJECT_ID }} >> .env
+        echo PRIVATE_KEY=${{ secrets.PRIVATE_KEY }} >> .env
+        echo ACCOUNT_ADDRESS=${{ secrets.ACCOUNT_ADDRESS }} >> .env
         cat .env
     
     - name: Install Truffle
