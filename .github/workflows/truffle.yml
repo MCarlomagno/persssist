@@ -22,12 +22,12 @@ jobs:
       run: npm --version
     
     - name: Create env file
-            run: |
-              touch .env
-              echo INFURA_PROJECT_ID=${{ secrets.INFURA_PROJECT_ID }} > .env
-              echo PRIVATE_KEY=${{ secrets.PRIVATE_KEY }} > .env
-              echo ACCOUNT_ADDRESS=${{ secrets.ACCOUNT_ADDRESS }} > .env
-              cat .env
+      run: |
+        touch .env
+        echo INFURA_PROJECT_ID=${{ secrets.INFURA_PROJECT_ID }} > .env
+        echo PRIVATE_KEY=${{ secrets.PRIVATE_KEY }} > .env
+        echo ACCOUNT_ADDRESS=${{ secrets.ACCOUNT_ADDRESS }} > .env
+        cat .env
     
     - name: Install Truffle
       run: npm install truffle@5.4.29 -g # cannot use truffle@latest due to https://github.com/sc-forks/solidity-coverage/issues/696
