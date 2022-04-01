@@ -12,7 +12,7 @@ export class AppBlockchain {
     web3: Web3 | undefined;
     initialized = false;
 
-    supportedNetworks = [NetwokIds.kovan];
+    supportedNetworks = [NetwokIds.rinkeby];
 
     constructor() {}
 
@@ -122,7 +122,7 @@ export class AppBlockchain {
         if(!this.supportedNetworks.includes(networkId)) {
             throw {
                 title: 'Network not supported', 
-                msg: 'Please make sure to connect to the Kovan Network'
+                msg: 'Please make sure to connect to the Rinkeby Network'
             }
         } else {
             this.contract = new this.web3.eth.Contract(
