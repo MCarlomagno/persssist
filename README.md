@@ -3,7 +3,9 @@
 </div>
 
 # Persssist
+
 [![Vercel](https://img.shields.io/github/deployments/mcarlomagno/persssist/production?label=vercel&logo=vercel&logoColor=white)](https://persssist.vercel.app/)
+![Tests](https://github.com/MCarlomagno/persssist/actions/workflows/truffle.yml/badge.svg)
 
 Storage web application running on top of Kovan testnet that uses IPFS protocol for storing files in an open and decentralized way.
 
