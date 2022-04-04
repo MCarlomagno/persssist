@@ -10,8 +10,25 @@
 
 Storage web application running on top of Rinkeby testnet that uses IPFS protocol for storing files in an open and decentralized way.
 
+## How it works
+
+// TODO: add process with diagrams asd stuff here.
+
 ## Running locally
-First, run the development server:
+
+First, configure .env and .env.local files
+
+```bash
+# TODO: add env vars here
+```
+
+In case you want to test on Ganache using Truffle:
+
+```bash
+# TODO: explain commands here
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
