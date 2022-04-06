@@ -46,7 +46,7 @@ export const uploadFile = async (
 	successCallback: (hash: string) => void, 
 	errorCallback: (e: any) => void
 ) => {
-	if(!file) throw 'file not provided';
+	if(!file) return errorCallback('File not provided');
 	const addResult = await appStorage.upload(file);
 	return appBlockchain.uploadFileMetadata(
 		addResult.path,

@@ -44,14 +44,14 @@ export const Header: NextPage<Props> = () => {
 	}
 
 	const onUploadError = (e: any) => {
-		console.log(e);
-		message.error(`Some error has ocurred`);
 		setIsLoading(false);
+		message.error(`An error has ocurred: ${e}`);
 	}
 
 	const onSubmit = async () => {
 		setIsLoading(true);
 		await uploadFile(file, list[0], onUploadSuccess, onUploadError)
+		setIsLoading(false);
 	}
 
 	return (

@@ -31,6 +31,7 @@ export class AppBlockchain {
         onSuccess: (hash: string) => void,
         onError: (e: any) => void,
     ) {
+        await this.ensureInitialized();
         return this.contract.methods
             .uploadFile(path, size, type, name)
             .send({ from: account })
@@ -84,7 +85,10 @@ export class AppBlockchain {
         if(typeof window === "undefined") return;
         this.initializeWeb3();
         if (this.web3) {
-            await this.initializeContract((err) => {});
+            console.log('initializing contract')
+            await this.initializeContract((err) => {
+                throw err;
+            });
         }
         this.initialized = true;
     }
@@ -126,9 +130,10 @@ export class AppBlockchain {
             }
         } else {
             this.contract = new this.web3.eth.Contract(
-                (Persssist as any),
+                (Persssist as any).abi,
                 process.env.NEXT_PUBLIC_CONTRACT
             );
+            
         }
     }
 
