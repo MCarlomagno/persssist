@@ -25,7 +25,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     dispatch(checkExistingAccounts());
     dispatch(subscribeToEvents(onError));
-	}, []);
+	}, [dispatch]);
 
   return (
     <div>
